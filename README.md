@@ -7,8 +7,8 @@ export TARGET_CC=/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.506
 export TARGET_AR=/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar
 export CC_AARCH64_LINUX_ANDROID=$TARGET_CC
 export AR_AARCH64_LINUX_ANDROID=$TARGET_AR
-export CARGO_TARGET_AR_AARCH64_LINUX_ANDROID_LINKER=$TARGET_CC
-export CARGO_TARGET_AR_AARCH64_LINUX_ANDROID_AR=$TARGET_AR
+export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$TARGET_CC
+export CARGO_TARGET_AARCH64_LINUX_ANDROID_AR=$TARGET_AR
 ```
 
 Building fails with:

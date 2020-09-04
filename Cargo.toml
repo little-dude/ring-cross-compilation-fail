@@ -5,10 +5,8 @@ authors = ["little-dude <corentinhenry@gmail.com>"]
 edition = "2018"
 description = "reproduce compilation error"
 
-[dependencies.reqwest]
-version = "0.10.6"
-default-features = false
-features = ["rustls-tls"]
+[dependencies]
+ring = "0.16.15"
 
 [lib]
 name = "cross_compile_reqwest_lib"

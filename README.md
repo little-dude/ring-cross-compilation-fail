@@ -38,7 +38,6 @@ finding the values):
 export NDK=/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045
 export NDK_BUILD_TOOLS=$NDK/libexec/android-sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/
 export NDK_SYSROOT=$NDK/libexec/android-sdk/ndk-bundle/sysroot/
-export 
 
 # Variables needed to build ring (see https://github.com/briansmith/ring/blob/98e25317b3a3dd9a71c07255f5c84e9a2ecef0be/BUILDING.md#cross-compiling)
 export TARGET_CC="$NDK_BUILD_TOOLS/aarch64-linux-android-gcc --sysroot $NDK_SYSROOT -I$NDK_SYSROOT/usr/include/aarch64-linux-android/"

@@ -1,7 +1,15 @@
 [package]
 name = "cross-compile-reqwest"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["little-dude <corentinhenry@gmail.com>"]
 edition = "2018"
+description = "reproduce compilation error"
 
-[dependencies]
+[dependencies.reqwest]
+version = "0.10.6"
+default-features = false
+features = ["rustls-tls"]
+
+[lib]
+name = "cross_compile_reqwest_lib"
+crate-type = ["staticlib", "cdylib"]

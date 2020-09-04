@@ -1,3 +1,65 @@
+This repo is a minimal reproduction of cross compilation issues I'm having,
+when compiling `ring` for android. There are several reasons these issues can
+arise: I'm using NixOS which comes with some quirks, and I'm using an old
+version of the android NDK (18, while the newest version is 21).
+
+The fact that I'm using this old NDK version means I cannot use `cargo-ndk`,
+which only supports NDKs>=19.
+
+- Rust version: `rustc 1.48.0-nightly (0d0f6b113 2020-09-03)`
+- OS: NixOS unstable, kernel 5.7.16
+- NDK version: `18.1.5063045`
+
+
+# How to (try to) build
+
+The furthest I've managed to go is with the following steps. Note that you'll
+need the rust `aarch64-linux-android` toolchain.
+
+First create a script named `cargo_target_aarch64_linux_android_linker.sh`:
+
+```
+#!/usr/bin/env bash
+
+set -x
+
+NDK_LIBS=$NDK/libexec/android-sdk/ndk-bundle/platforms/android-21/arch-x86/usr/lib/
+
+$NDK_BUILD_TOOLS/aarch64-linux-android-gcc \
+    -fuse-ld=$NDK_BUILD_TOOLS/aarch64-linux-android-ld \
+    -Wl,-rpath-link=$NDK_LIBS -L $NDK_LIBS \
+    $@
+```
+
+Then export the following env variables (we detail below the steps we used for
+finding the values):
+
+```
+export NDK=/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045
+export NDK_BUILD_TOOLS=$NDK/libexec/android-sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/
+export NDK_SYSROOT=$NDK/libexec/android-sdk/ndk-bundle/sysroot/
+export 
+
+# Variables needed to build ring (see https://github.com/briansmith/ring/blob/98e25317b3a3dd9a71c07255f5c84e9a2ecef0be/BUILDING.md#cross-compiling)
+export TARGET_CC="$NDK_BUILD_TOOLS/aarch64-linux-android-gcc --sysroot $NDK_SYSROOT -I$NDK_SYSROOT/usr/include/aarch64-linux-android/"
+export TARGET_AR=$NDK_BUILD_TOOLS/aarch64-linux-android-ar
+
+# Variable needed by cargo (taken from https://github.com/bbqsrc/cargo-ndk/blob/237da806522f0241ed579856032b3fab1db49926/src/cargo.rs#L75)
+export CC_AARCH64_LINUX_ANDROID=$TARGET_CC
+export AR_AARCH64_LINUX_ANDROID=$TARGET_AR
+
+# Variables needed by cargo (taken from https://github.com/bbqsrc/cargo-ndk/blob/237da806522f0241ed579856032b3fab1db49926/src/cargo.rs#L61)
+export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$TARGET_CC
+export CARGO_TARGET_AARCH64_LINUX_ANDROID_AR=$TARGET_AR
+```
+
+Then run `cargo clean && cargo build --target aarch64-linux-android` (which
+should fail at linking time).
+
+# Debugging notes
+
+The notes below sum up the steps I've followed so far to compile ring.
+
 - Rust version: `rustc 1.48.0-nightly (0d0f6b113 2020-09-03)`
 - OS: NixOS unstable, kernel 5.7.16
 - NDK version: `18.1.5063045`
@@ -68,7 +130,17 @@ Building fails with:
 ```
 
 The problem can be fixed by passing `--sysroot` and the appropriate `-I` flag
-to clang in `TARGET_CC`:
+to clang in `TARGET_CC`. First we'll need to find that `string.h` file though:
+
+```
+❯ find $NDK -name string.h
+/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sysroot/usr/include/bits/fortify/string.h
+/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sysroot/usr/include/string.h
+/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sysroot/usr/include/linux/string.h
+/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include/string.h
+```
+
+Let's try with `/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sysroot/usr/include/string.h`:
 
 ```
 export NDK_SYSROOT=$NDK/libexec/android-sdk/ndk-bundle/sysroot/
@@ -77,7 +149,7 @@ export CC_AARCH64_LINUX_ANDROID=$TARGET_CC
 export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$TARGET_CC
 ```
 
-Things now fail with the linker:
+We're now going a step further: compilation fail with the linker:
 
 ```
 error: linker `/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin//aarch64-linux-android-gcc --sysroot /nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sysroot/ -I/nix/store/5p5zlzc7h33ab44vw6qf91c02zffz1da-ndk-bundle-18.1.5063045/libexec/android-sdk/ndk-bundle/sysroot//usr/include/aarch64-linux-android/` not found
@@ -174,3 +246,5 @@ Yet the library is there:
 crtbegin_dynamic.o  crtbegin_static.o  crtend_so.o    libc.a   libcompiler_rt-extras.a  libdl.so   libGLESv1_CM.so  libGLESv3.so       liblog.so  libm.so         libOpenMAXAL.so  libstdc++.a   libz.a
 crtbegin_so.o       crtend_android.o   libandroid.so  libc.so  libdl.a                  libEGL.so  libGLESv2.so     libjnigraphics.so  libm.a     libmediandk.so  libOpenSLES.so   libstdc++.so  libz.so
 ```
+
+From there I don't know where to go.

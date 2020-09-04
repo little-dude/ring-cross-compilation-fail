@@ -14,16 +14,23 @@ export CARGO_TARGET_AR_AARCH64_LINUX_ANDROID_AR=$TARGET_AR
 Building fails with:
 
 ```
-❯ cargo build --target aarch64-linux-android
+❯ cargo clean
+❯ RUST_LOG=debug cargo build --target aarch64-linux-android --verbose
+   Compiling libc v0.2.76
+   Compiling cc v1.0.59
+     Running `rustc --crate-name build_script_build /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.76/build.rs --error-format=json --json=diagnostic-rendered-ansi --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 -C metadata=47a60803ef633ccc -C extra-filename=-47a60803ef633ccc --out-dir /home/little-dude/code/cross-compile-reqwest/target/debug/build/libc-47a60803ef633ccc -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --cap-lints allow`
+   Compiling spin v0.5.2
+   Compiling untrusted v0.7.1
+   Compiling once_cell v1.4.1
+     Running `rustc --crate-name cc --edition=2018 /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/cc-1.0.59/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C metadata=8edb3ae1a90316ac -C extra-filename=-8edb3ae1a90316ac --out-dir /home/little-dude/code/cross-compile-reqwest/target/debug/deps -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --cap-lints allow`
+     Running `rustc --crate-name spin /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/spin-0.5.2/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C metadata=5a5b56489622e5fb -C extra-filename=-5a5b56489622e5fb --out-dir /home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps --target aarch64-linux-android -L dependency=/home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --cap-lints allow`
+     Running `rustc --crate-name untrusted --edition=2018 /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/untrusted-0.7.1/src/untrusted.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C metadata=e050622b37850aa1 -C extra-filename=-e050622b37850aa1 --out-dir /home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps --target aarch64-linux-android -L dependency=/home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --cap-lints allow`
+     Running `rustc --crate-name once_cell --edition=2018 /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/once_cell-1.4.1/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 --cfg 'feature="std"' -C metadata=6c8b3b22da8da194 -C extra-filename=-6c8b3b22da8da194 --out-dir /home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps --target aarch64-linux-android -L dependency=/home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --cap-lints allow`
+     Running `/home/little-dude/code/cross-compile-reqwest/target/debug/build/libc-47a60803ef633ccc/build-script-build`
+     Running `rustc --crate-name libc /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.76/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 -C metadata=f55ae190085d5878 -C extra-filename=-f55ae190085d5878 --out-dir /home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps --target aarch64-linux-android -L dependency=/home/little-dude/code/cross-compile-reqwest/target/aarch64-linux-android/debug/deps -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --cap-lints allow --cfg freebsd11 --cfg libc_priv_mod_use --cfg libc_union --cfg libc_const_size_of --cfg libc_align --cfg libc_core_cvoid --cfg libc_packedN --cfg libc_cfg_target_vendor`
    Compiling ring v0.16.15
-   Compiling http-body v0.3.1
-   Compiling mio v0.6.22
-   Compiling url v2.1.1
-   Compiling syn v1.0.39
-   Compiling indexmap v1.5.2
-   Compiling mime_guess v2.0.3
-   Compiling tokio v0.2.22
-   Compiling serde_urlencoded v0.6.1
+     Running `rustc --crate-name build_script_build --edition=2018 /home/little-dude/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.15/build.rs --error-format=json --json=diagnostic-rendered-ansi --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --cfg 'feature="alloc"' --cfg 'feature="default"' --cfg 'feature="dev_urandom_fallback"' --cfg 'feature="once_cell"' -C metadata=ca64f0e328c4a008 -C extra-filename=-ca64f0e328c4a008 --out-dir /home/little-dude/code/cross-compile-reqwest/target/debug/build/ring-ca64f0e328c4a008 -L dependency=/home/little-dude/code/cross-compile-reqwest/target/debug/deps --extern cc=/home/little-dude/code/cross-compile-reqwest/target/debug/deps/libcc-8edb3ae1a90316ac.rlib --cap-lints allow`
+     Running `/home/little-dude/code/cross-compile-reqwest/target/debug/build/ring-ca64f0e328c4a008/build-script-build`
 error: failed to run custom build command for `ring v0.16.15`
 
 Caused by:
@@ -294,6 +301,7 @@ Caused by:
   ENV RUSTC=rustc
   ENV RUSTDOC=rustdoc
   ENV RUST_BACKTRACE=1
+  ENV RUST_LOG=debug
   ENV SESSION_MANAGER=local/xain-laptop:@/tmp/.ICE-unix/1949,unix/xain-laptop:/tmp/.ICE-unix/1949
   ENV SHELL=/run/current-system/sw/bin/zsh
   ENV SHLVL=3
@@ -427,6 +435,4 @@ Caused by:
     19: core::ops::function::FnOnce::call_once
                at /rustc/0d0f6b113047b2cf9afbde990cee30fd5b866469/library/core/src/ops/function.rs:227
   note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
-warning: build failed, waiting for other jobs to finish...
-error: build failed
 ```
